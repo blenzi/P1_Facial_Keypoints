@@ -29,7 +29,7 @@ class Net(nn.Module):
         ## Note that among the layers to add, consider including:
         # maxpooling layers, multiple conv layers, fully-connected layers, and other layers (such as dropout or batch normalization) to avoid overfitting
         self.pool = nn.MaxPool2d(2, 2)
-        self.fc1 = nn.Linear(32*109*109, 68)
+        self.fc1 = nn.Linear(32*109*109, 68*2)
         
     def forward(self, x):
         ## TODO: Define the feedforward behavior of this model
