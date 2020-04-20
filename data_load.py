@@ -2,6 +2,7 @@ import glob
 import os
 import torch
 from torch.utils.data import Dataset, DataLoader
+from torchvision import transforms
 import numpy as np
 import matplotlib.image as mpimg
 import pandas as pd
@@ -140,7 +141,34 @@ class RandomCrop(object):
 
         return {'image': image, 'keypoints': key_pts}
 
+class RandomHorizontalFlip(object):
+    """Horizontally flip the given image randomly with a given probability.
 
+    Args:
+        p (float): probability of the image being flipped. Default value is 0.5
+    """
+
+    def __init__(self, p=0.5):
+        self.p = p
+
+    def __call__(self, sample):
+        """
+        Args:
+            sample: dict with image (numpy array) and keypoints (68x2 array) to be flipped 
+
+        Returns:
+            dict with image (numpy array) and keypoints (68x2 array) flipped or not
+        """
+        if np.random.random() < self.p:
+            image, key_pts = sample['image'], sample['keypoints']
+            return {'image': np.flip(image, axis=1), 
+                    'keypoints': key_pts * (-1, 1) + (image.shape[0], 0)}
+        return sample
+
+    def __repr__(self):
+        return self.__class__.__name__ + '(p={})'.format(self.p)
+
+    
 class ToTensor(object):
     """Convert ndarrays in sample to Tensors."""
 
@@ -159,3 +187,11 @@ class ToTensor(object):
         
         return {'image': torch.from_numpy(image),
                 'keypoints': torch.from_numpy(key_pts)}
+
+def getTransform():
+    "Return composed transform to be used in Facial_Keypoints"
+    return transforms.Compose([Rescale(250),
+                               RandomCrop(224),
+                               RandomHorizontalFlip(),
+                               Normalize(),
+                               ToTensor()])
