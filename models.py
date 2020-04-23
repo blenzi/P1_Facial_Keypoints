@@ -31,18 +31,15 @@ class Net(nn.Module):
         
         self.conv4 = nn.Conv2d(128, 256, 3, stride=2)
         self.bn4 = nn.BatchNorm2d(256, eps=1e-05, momentum=0.1, affine=True)
+
+        self.conv5 = nn.Conv2d(256, 512, 3, stride=2)
+        self.bn5 = nn.BatchNorm2d(512, eps=1e-05, momentum=0.1, affine=True)
+
                 
         ## Note that among the layers to add, consider including:
         # maxpooling layers, multiple conv layers, fully-connected layers, and other layers (such as dropout or batch normalization) to avoid overfitting
-#        self.pool = nn.MaxPool2d(2, 2)
-#        self.fc1 = nn.Linear(128*28*28, 68*2)
-#        self.pool = nn.MaxPool2d(5, 3)
-#        self.fc1 = nn.Linear(128*13*13, 68*2)
-#        self.fc1 = nn.Linear(128*13*13, 512)
-#        self.fc2 = nn.Linear(512, 68*2)
-#        self.fc1 = nn.Linear(256*6*6, 68*2)
-        self.fc1 = nn.Linear(256*13*13, 256)
-        #self.fc1 = nn.Linear(256*6*6, 256)
+        self.pool = nn.MaxPool2d(2, 2)
+        self.fc1 = nn.Linear(128*6*6, 256)
         self.fc2 = nn.Linear(256, 68*2)
 
 
@@ -56,8 +53,8 @@ class Net(nn.Module):
         x = F.relu(self.bn2(self.conv2(x)))
         x = F.relu(self.bn3(self.conv3(x)))
         x = F.relu(self.bn4(self.conv4(x)))
-        #x = self.pool(x)
-        #x = self.pool(self.bn4(F.relu(self.conv4(x))))
+        x = F.relu(self.bn5(self.conv5(x)))
+        x = self.pool(x)
         
         # a modified x, having gone through all the layers of your model, should be returned
 
@@ -66,11 +63,8 @@ class Net(nn.Module):
         x = x.view(x.size(0), -1)
         
         # linear layers
-        #x = self.fc1(x)
-        x = torch.tanh(self.fc1(x))
+        x = self.fc1(x)
+        x = F.relu(x)
         x = self.fc2(x)
-        
-        # limit range to [-1,1]
-#        x = F.tanh(x)
 
         return x
