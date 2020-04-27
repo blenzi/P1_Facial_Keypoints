@@ -196,7 +196,6 @@ def get_transform():
     "Return composed transform to be used in Facial_Keypoints"
     return transforms.Compose([Rescale(250),
                                RandomCrop(224),
-                               RandomHorizontalFlip(),
                                Normalize(),
                                ToTensor()])
 
